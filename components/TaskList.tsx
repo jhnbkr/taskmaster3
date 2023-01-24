@@ -1,34 +1,70 @@
-import { doc, DocumentReference } from "firebase/firestore";
-import { ChangeEvent } from "react";
+import { onSnapshot } from "firebase/firestore";
+import { ChangeEvent, useEffect, useState } from "react";
 
-import { removeTaskList, updateTaskList } from "api/tasklist";
-import { createTask } from "api/task";
+import { createTask, queryTasks } from "api/task";
+import {
+    referenceTaskList,
+    removeTaskList,
+    updateTaskList,
+} from "api/tasklist";
 import AddIcon from "components/svg/AddIcon";
 import DeleteIcon from "components/svg/DeleteIcon";
 import Task from "components/Task";
 import { useNotification } from "context/NotificationContext";
-import { database } from "lib/firebase";
-import { default as TaskType } from "types/task";
-import { default as TaskListType } from "types/tasklist";
-import User from "types/user";
+import { default as UserType } from "types/user";
 
 type Props = {
-    user: User;
-    taskList: TaskListType;
+    user: UserType;
+    taskListId: string;
 };
 
-export default function TaskList({ user, taskList }: Props) {
+export default function TaskList({ user, taskListId }: Props) {
     const { error } = useNotification();
-    const taskListRef: DocumentReference = doc(
-        database,
-        "users",
-        user.id,
-        "lists",
-        taskList.id
-    );
+
+    const [name, setName] = useState<string>("");
+    const [taskIds, setTaskIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            referenceTaskList(user, taskListId),
+            (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    setName(data.name);
+                } else {
+                    setName("");
+                }
+            }
+        );
+
+        return () => unsubscribe();
+    }, [user, taskListId]);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            queryTasks(user, taskListId),
+            (snapshot) => {
+                const taskIds: [number, string][] = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    taskIds.push([data.createdAt, doc.id]);
+                });
+                taskIds.sort((a, b) => {
+                    return a[0] - b[0];
+                });
+                setTaskIds(
+                    taskIds.map(([_, taskId]) => {
+                        return taskId;
+                    })
+                );
+            }
+        );
+
+        return () => unsubscribe();
+    }, [user, taskListId]);
 
     async function handleRenameTaskList(event: ChangeEvent<HTMLInputElement>) {
-        const success = await updateTaskList(taskListRef, {
+        const success = await updateTaskList(user, taskListId, {
             name: event.target.value,
         });
         if (!success) error("Something went wrong");
@@ -36,12 +72,12 @@ export default function TaskList({ user, taskList }: Props) {
 
     async function handleRemoveTaskList() {
         if (!confirm("Are you sure you want to delete this list?")) return;
-        const success = await removeTaskList(taskListRef);
+        const success = await removeTaskList(user, taskListId);
         if (!success) error("Something went wrong");
     }
 
     async function handleCreateTask() {
-        const success = user && (await createTask(taskListRef));
+        const success = user && (await createTask(user, taskListId));
         if (!success) error("Something went wrong");
     }
 
@@ -51,7 +87,7 @@ export default function TaskList({ user, taskList }: Props) {
                 <input
                     type="text"
                     placeholder="Name list here"
-                    defaultValue={taskList.name}
+                    defaultValue={name}
                     onChange={handleRenameTaskList}
                     className="text-white placeholder:text-white text-base w-full p-0 bg-transparent border-0 focus:ring-0"
                 />
@@ -63,13 +99,13 @@ export default function TaskList({ user, taskList }: Props) {
                 </div>
             </div>
             <div className="px-4 divide-y divide-gray-200">
-                {Object.keys(taskList.tasks).map((key: string) => {
-                    const task: TaskType = taskList.tasks[key];
+                {taskIds.map((taskId: string) => {
                     return (
                         <Task
-                            key={task.id}
-                            taskListRef={taskListRef}
-                            task={task}
+                            key={taskId}
+                            user={user}
+                            taskListId={taskListId}
+                            taskId={taskId}
                         />
                     );
                 })}

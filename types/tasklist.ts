@@ -1,11 +1,11 @@
-import Task from "types/task";
+import { default as TaskType } from "types/task";
 
 type TaskList = {
     id: string;
     name: string;
-    tasks: { [key: string]: Task };
-    created_at: number;
-    updated_at: number;
+    tasks: TaskType[];
+    createdAt: number;
+    updatedAt: number;
 };
 
 export default TaskList;

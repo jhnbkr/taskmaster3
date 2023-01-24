@@ -7,12 +7,12 @@ import {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import Notification from "types/notification";
+import { default as NotificationType } from "types/notification";
 
 const notificationTimeout = 2000;
 
 type NotificationContext = {
-    notifications: Notification[];
+    notifications: NotificationType[];
     notice(message: string): void;
     warning(message: string): void;
     error(message: string): void;
@@ -38,7 +38,7 @@ type Props = {
 };
 
 export function NotificationProvider({ children }: Props) {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -51,7 +51,7 @@ export function NotificationProvider({ children }: Props) {
         message: string,
         type: "notice" | "warning" | "error"
     ) {
-        const notification: Notification = {
+        const notification: NotificationType = {
             id: uuidv4(),
             message: message,
             type: type,

@@ -2,27 +2,33 @@ import {
     collection,
     deleteDoc,
     doc,
-    DocumentData,
     DocumentReference,
-    query,
     Query,
+    query,
     setDoc,
     updateDoc,
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 import { database, handleError } from "lib/firebase";
-import TaskList from "types/tasklist";
-import User from "types/user";
+import { default as TaskListType } from "types/tasklist";
+import { default as UserType } from "types/user";
 
-export function retrieveTaskLists(user: User): Query {
+export function queryTaskLists(user: UserType): Query {
     return query(collection(database, "users/" + user.id, "lists"));
 }
 
-export async function createTaskList(user: User): Promise<boolean> {
+export function referenceTaskList(
+    user: UserType,
+    taskListId: string
+): DocumentReference {
+    return doc(database, "users", user.id, "lists", taskListId);
+}
+
+export async function createTaskList(user: UserType): Promise<boolean> {
     try {
-        await setDoc(doc(database, "users", user.id, "lists", uuidv4()), {
-            created_at: Date.now(),
+        await setDoc(referenceTaskList(user, uuidv4()), {
+            createdAt: Date.now(),
         });
         return true;
     } catch (error) {
@@ -32,11 +38,15 @@ export async function createTaskList(user: User): Promise<boolean> {
 }
 
 export async function updateTaskList(
-    taskListRef: DocumentReference,
-    data: Partial<TaskList>
+    user: UserType,
+    taskListId: string,
+    data: Partial<TaskListType>
 ): Promise<boolean> {
     try {
-        await updateDoc(taskListRef, { ...data, updated_at: Date.now() });
+        await updateDoc(referenceTaskList(user, taskListId), {
+            ...data,
+            updatedAt: Date.now(),
+        });
         return true;
     } catch (error) {
         handleError(error);
@@ -45,33 +55,14 @@ export async function updateTaskList(
 }
 
 export async function removeTaskList(
-    taskListRef: DocumentReference
+    user: UserType,
+    taskListId: string
 ): Promise<boolean> {
     try {
-        await deleteDoc(taskListRef);
+        await deleteDoc(referenceTaskList(user, taskListId));
         return true;
     } catch (error) {
         handleError(error);
         return false;
     }
-}
-
-export function serializeTaskList(taskListDoc: DocumentData): TaskList {
-    const data = taskListDoc.data();
-    return {
-        id: taskListDoc.id,
-        name: data.name,
-        tasks: data.tasks
-            ? Object.keys(data.tasks)
-                  .map((key: string) => {
-                      return { id: key, ...data.tasks[key] };
-                  })
-                  .sort((a, b) => {
-                      return a.created_at - b.created_at;
-                  })
-                  .reduce((tasks, task) => ({ ...tasks, [task.id]: task }), {})
-            : {},
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-    };
 }

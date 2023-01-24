@@ -1,38 +1,38 @@
 import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import {
-    createTaskList,
-    retrieveTaskLists,
-    serializeTaskList,
-} from "api/tasklist";
+import { createTaskList, queryTaskLists } from "api/tasklist";
 import AddIcon from "components/svg/AddIcon";
 import TaskList from "components/TaskList";
 import { useAuth } from "context/AuthContext";
 import { useNotification } from "context/NotificationContext";
-import { default as TaskListType } from "types/tasklist";
 
 export default function TaskManager() {
     const { user } = useAuth();
     const { error } = useNotification();
 
-    const [taskLists, setTaskLists] = useState<TaskListType[]>([]);
+    const [taskListIds, setTaskListIds] = useState<string[]>([]);
 
     useEffect(() => {
         if (!user) {
-            setTaskLists([]);
+            setTaskListIds([]);
             return;
         }
 
-        const unsubscribe = onSnapshot(retrieveTaskLists(user), (snapshot) => {
-            const taskLists: TaskListType[] = [];
+        const unsubscribe = onSnapshot(queryTaskLists(user), (snapshot) => {
+            const taskListIds: [number, string][] = [];
             snapshot.forEach((doc) => {
-                taskLists.push(serializeTaskList(doc));
+                const data = doc.data();
+                taskListIds.push([data.createdAt, doc.id]);
             });
-            taskLists.sort((a, b) => {
-                return a.created_at - b.created_at;
+            taskListIds.sort((a, b) => {
+                return a[0] - b[0];
             });
-            setTaskLists(taskLists);
+            setTaskListIds(
+                taskListIds.map(([_, taskId]) => {
+                    return taskId;
+                })
+            );
         });
 
         return () => unsubscribe();
@@ -47,12 +47,12 @@ export default function TaskManager() {
 
     return (
         <div className="container grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-            {taskLists.map((taskList) => {
+            {taskListIds.map((taskListId) => {
                 return (
                     <TaskList
-                        key={taskList.id}
+                        key={taskListId}
                         user={user}
-                        taskList={taskList}
+                        taskListId={taskListId}
                     />
                 );
             })}

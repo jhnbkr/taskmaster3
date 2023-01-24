@@ -1,28 +1,50 @@
-import { DocumentReference } from "firebase/firestore";
-import { ChangeEvent } from "react";
+import { onSnapshot } from "firebase/firestore";
+import { ChangeEvent, useEffect, useState } from "react";
 
-import { removeTask, updateTask } from "api/task";
+import { referenceTask, removeTask, updateTask } from "api/task";
 import CloseIcon from "components/svg/CloseIcon";
 import { useNotification } from "context/NotificationContext";
-import { default as TaskType } from "types/task";
+import { default as UserType } from "types/user";
 
 type Props = {
-    taskListRef: DocumentReference;
-    task: TaskType;
+    user: UserType;
+    taskListId: string;
+    taskId: string;
 };
 
-export default function Task({ taskListRef, task }: Props) {
+export default function Task({ user, taskListId, taskId }: Props) {
     const { error } = useNotification();
 
+    const [description, setDescription] = useState<string>("");
+    const [completed, setCompleted] = useState<boolean>(false);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            referenceTask(user, taskListId, taskId),
+            (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    setDescription(data.description);
+                    setCompleted(data.completed);
+                } else {
+                    setDescription("");
+                    setCompleted(false);
+                }
+            }
+        );
+
+        return () => unsubscribe();
+    }, [user, taskListId, taskId]);
+
     async function handleRenameTask(event: ChangeEvent<HTMLInputElement>) {
-        const success = await updateTask(taskListRef, task.id, {
+        const success = await updateTask(user, taskListId, taskId, {
             description: event.target.value,
         });
         if (!success) error("Something went wrong");
     }
 
     async function handleCompleteTask(event: ChangeEvent<HTMLInputElement>) {
-        const success = await updateTask(taskListRef, task.id, {
+        const success = await updateTask(user, taskListId, taskId, {
             completed: event.target.checked,
         });
         if (!success) error("Something went wrong");
@@ -30,7 +52,7 @@ export default function Task({ taskListRef, task }: Props) {
 
     async function handleRemoveTask() {
         if (!confirm("Are you sure you want to delete this task?")) return;
-        const success = await removeTask(taskListRef, task.id);
+        const success = await removeTask(user, taskListId, taskId);
         if (!success) error("Something went wrong");
     }
 
@@ -39,7 +61,7 @@ export default function Task({ taskListRef, task }: Props) {
             <input
                 name="completed"
                 type="checkbox"
-                checked={task.completed}
+                checked={completed}
                 onChange={handleCompleteTask}
                 className="peer/completed h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-0"
             />
@@ -47,7 +69,7 @@ export default function Task({ taskListRef, task }: Props) {
                 name="description"
                 type="text"
                 placeholder="Describe task here"
-                defaultValue={task.description}
+                defaultValue={description}
                 onChange={handleRenameTask}
                 className="text-gray-700 text-base w-full p-0 bg-transparent border-0 focus:ring-0 peer-checked/completed:line-through"
             />

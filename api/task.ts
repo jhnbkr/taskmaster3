@@ -1,25 +1,50 @@
-import { deleteField, DocumentReference, setDoc } from "firebase/firestore";
+import {
+    collection,
+    deleteDoc,
+    doc,
+    DocumentReference,
+    query,
+    Query,
+    setDoc,
+    updateDoc,
+} from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
-import { handleError } from "lib/firebase";
-import Task from "types/task";
+import { database, handleError } from "lib/firebase";
+import { default as TaskType } from "types/task";
+import { default as UserType } from "types/user";
+
+export function queryTasks(user: UserType, taskListId: string): Query {
+    return query(
+        collection(database, "users/" + user.id, "lists", taskListId, "tasks")
+    );
+}
+
+export function referenceTask(
+    user: UserType,
+    taskListId: string,
+    taskId: string
+): DocumentReference {
+    return doc(
+        database,
+        "users",
+        user.id,
+        "lists",
+        taskListId,
+        "tasks",
+        taskId
+    );
+}
 
 export async function createTask(
-    taskListRef: DocumentReference
+    user: UserType,
+    taskListId: string
 ): Promise<boolean> {
     try {
-        const task: Partial<Task> = {
+        await setDoc(referenceTask(user, taskListId, uuidv4()), {
             completed: false,
-            created_at: Date.now(),
-        };
-        await setDoc(
-            taskListRef,
-            {
-                tasks: { [uuidv4()]: task },
-                updated_at: Date.now(),
-            },
-            { merge: true }
-        );
+            createdAt: Date.now(),
+        });
         return true;
     } catch (error) {
         handleError(error);
@@ -28,20 +53,16 @@ export async function createTask(
 }
 
 export async function updateTask(
-    taskListRef: DocumentReference,
-    id: string,
-    task: Partial<Task>
+    user: UserType,
+    taskListId: string,
+    taskId: string,
+    data: Partial<TaskType>
 ): Promise<boolean> {
     try {
-        task.updated_at = Date.now();
-        await setDoc(
-            taskListRef,
-            {
-                tasks: { [id]: task },
-                updated_at: Date.now(),
-            },
-            { merge: true }
-        );
+        await updateDoc(referenceTask(user, taskListId, taskId), {
+            ...data,
+            updatedAt: Date.now(),
+        });
         return true;
     } catch (error) {
         handleError(error);
@@ -50,18 +71,12 @@ export async function updateTask(
 }
 
 export async function removeTask(
-    taskListRef: DocumentReference,
-    key: string
+    user: UserType,
+    taskListId: string,
+    taskId: string
 ): Promise<boolean> {
     try {
-        await setDoc(
-            taskListRef,
-            {
-                tasks: { [key]: deleteField() },
-                updated_at: Date.now(),
-            },
-            { merge: true }
-        );
+        await deleteDoc(referenceTask(user, taskListId, taskId));
         return true;
     } catch (error) {
         handleError(error);
