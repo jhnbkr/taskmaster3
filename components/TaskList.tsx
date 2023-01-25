@@ -87,21 +87,26 @@ export default function TaskList({ user, taskListId }: Props) {
 
     return (
         <div className="bg-white shadow sm:rounded-lg overflow-hidden">
-            <div className="bg-indigo-600 flex w-full items-center justify-between p-4 space-x-4">
+            <fieldset
+                name="task list"
+                className="bg-indigo-600 flex w-full items-center justify-between p-4 space-x-4"
+            >
                 <input
                     type="text"
                     placeholder="Name list here"
                     defaultValue={name}
                     onChange={handleRenameTaskList}
                     className="text-white placeholder:text-white text-base w-full p-0 bg-transparent border-0 focus:ring-0"
+                    aria-label="task list name"
                 />
                 <div
                     onClick={handleRemoveTaskList}
                     className="text-white hover:cursor-pointer"
                 >
-                    <DeleteIcon className="w-6 h-6" />
+                    <span className="sr-only">Remove task list</span>
+                    <DeleteIcon className="w-6 h-6" aria-hidden="true" />
                 </div>
-            </div>
+            </fieldset>
             <div className="px-4 divide-y divide-gray-200">
                 {taskIds.map((taskId: string) => {
                     return (
@@ -117,7 +122,11 @@ export default function TaskList({ user, taskListId }: Props) {
                     onClick={handleCreateTask}
                     className="flex justify-center items-center px-2 py-4"
                 >
-                    <AddIcon className="w-6 h-6 text-green-600 hover:cursor-pointer" />
+                    <span className="sr-only">Create task</span>
+                    <AddIcon
+                        className="w-6 h-6 text-green-600 hover:cursor-pointer"
+                        aria-hidden="true"
+                    />
                 </div>
             </div>
         </div>

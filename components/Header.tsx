@@ -1,8 +1,8 @@
-import { logout } from "lib/auth";
 import LogoIcon from "components/svg/LogoIcon";
 import LogoName from "components/svg/LogoName";
 import { useAuth } from "context/AuthContext";
 import { useNotification } from "context/NotificationContext";
+import { logout } from "lib/auth";
 
 export default function Header() {
     const { user } = useAuth();
@@ -19,16 +19,27 @@ export default function Header() {
             <div className="mx-auto container p-6">
                 <div className="flex w-full items-center justify-between">
                     <div className="flex space-x-4 items-center">
-                        <LogoIcon className="w-10 h-10 stroke-white" />
-                        <LogoName className="h-5 fill-white" />
+                        <span className="sr-only">Task Master 3</span>
+                        <LogoIcon
+                            className="w-10 h-10 stroke-white"
+                            area-hidden="true"
+                        />
+                        <LogoName
+                            className="h-5 fill-white"
+                            area-hidden="true"
+                        />
                     </div>
 
                     {user && (
                         <>
                             <div className="flex space-x-4 items-center">
-                                <p className="hidden sm:block text-base font-medium text-white">
+                                <p
+                                    className="hidden sm:block text-base font-medium text-white"
+                                    aria-label="authenticated user"
+                                >
                                     {user.email}
                                 </p>
+
                                 <button
                                     type="button"
                                     onClick={handleLogout}

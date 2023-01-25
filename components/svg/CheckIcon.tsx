@@ -1,6 +1,6 @@
 import { SVGProps } from "components/svg";
 
-export default function CheckIcon({ className }: SVGProps) {
+export default function CheckIcon({ className, ...props }: SVGProps) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -9,6 +9,7 @@ export default function CheckIcon({ className }: SVGProps) {
             strokeWidth={1.5}
             stroke="currentColor"
             className={className}
+            {...props}
         >
             <path
                 strokeLinecap="round"

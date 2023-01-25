@@ -62,7 +62,8 @@ export default function TaskManager() {
                     onClick={handleCreateTaskList}
                     className="p-3 bg-indigo-600 hover:bg-indigo-800 text-white shadow rounded-full hover:cursor-pointer transition-all"
                 >
-                    <AddIcon className="w-6 h-6" />
+                    <span className="sr-only">Create task list</span>
+                    <AddIcon className="w-6 h-6" aria-hidden="true" />
                 </button>
             </div>
         </div>

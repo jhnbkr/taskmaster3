@@ -14,18 +14,18 @@ const links: FooterLink[] = [
     {
         name: "Website",
         href: "https://johnbaker.ca",
-        icon: <WebsiteIcon className="h-6 w-6" />,
+        icon: <WebsiteIcon className="h-6 w-6" aria-hidden="true" />,
     },
 
     {
         name: "Twitter",
         href: "https://twitter.com/jhnbkr88",
-        icon: <TwitterIcon className="h-6 w-6" />,
+        icon: <TwitterIcon className="h-6 w-6" aria-hidden="true" />,
     },
     {
         name: "GitHub",
         href: "https://github.com/jhnbkr",
-        icon: <GitHubIcon className="h-6 w-6" />,
+        icon: <GitHubIcon className="h-6 w-6" aria-hidden="true" />,
     },
 ];
 
@@ -48,7 +48,10 @@ export default function Footer() {
                     ))}
                 </div>
                 <div className="mt-6 md:order-1 md:mt-0">
-                    <p className="text-center text-xs leading-5 text-gray-500">
+                    <p
+                        className="text-center text-xs leading-5 text-gray-500"
+                        aria-label="copyright"
+                    >
                         &copy; {new Date().getFullYear()} John Baker
                     </p>
                 </div>

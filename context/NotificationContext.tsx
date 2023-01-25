@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { default as NotificationType } from "types/notification";
 
-const notificationTimeout = 2000;
+const defaultNotificationTimeout: number = 3000;
 
 type NotificationContext = {
     notifications: NotificationType[];
@@ -41,9 +41,17 @@ export function NotificationProvider({ children }: Props) {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
     useEffect(() => {
+        if (notifications.length < 1) return;
+
+        const timeout: number = Math.max(
+            notifications[0].expiresAt - Date.now(),
+            0
+        );
+
         const timer = setTimeout(() => {
             setNotifications(notifications.slice(1));
-        }, notificationTimeout);
+        }, timeout);
+
         return () => clearTimeout(timer);
     }, [notifications]);
 
@@ -55,6 +63,8 @@ export function NotificationProvider({ children }: Props) {
             id: uuidv4(),
             message: message,
             type: type,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + defaultNotificationTimeout,
         };
         setNotifications([...notifications, notification]);
     }

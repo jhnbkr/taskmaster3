@@ -9,10 +9,7 @@ export default function NotificationCenter() {
             <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
                 {notifications.map((notification) => {
                     return (
-                        <Notification
-                            key={notification.id}
-                            notification={notification}
-                        />
+                        <Notification key={notification.id} {...notification} />
                     );
                 })}
             </div>

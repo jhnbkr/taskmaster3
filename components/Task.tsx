@@ -82,7 +82,8 @@ export default function Task({ user, taskListId, taskId }: Props) {
                 onClick={handleRemoveTask}
                 className="text-red-400 hover:cursor-pointer"
             >
-                <CloseIcon className="w-6 h-6" />
+                <span className="sr-only">Remove task</span>
+                <CloseIcon className="w-6 h-6" aria-hidden="true" />
             </div>
         </fieldset>
     );
