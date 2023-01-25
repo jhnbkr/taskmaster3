@@ -71,7 +71,11 @@ export default function TaskList({ user, taskListId }: Props) {
     }
 
     async function handleRemoveTaskList() {
-        if (!confirm("Are you sure you want to delete this list?")) return;
+        if (
+            (name || taskIds.length > 0) &&
+            !confirm("Are you sure you want to delete this list?")
+        )
+            return;
         const success = await removeTaskList(user, taskListId);
         if (!success) error("Something went wrong");
     }

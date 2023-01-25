@@ -51,7 +51,11 @@ export default function Task({ user, taskListId, taskId }: Props) {
     }
 
     async function handleRemoveTask() {
-        if (!confirm("Are you sure you want to delete this task?")) return;
+        if (
+            description &&
+            !confirm("Are you sure you want to delete this task?")
+        )
+            return;
         const success = await removeTask(user, taskListId, taskId);
         if (!success) error("Something went wrong");
     }

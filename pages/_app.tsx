@@ -1,5 +1,4 @@
 import type { AppProps } from "next/app";
-import Script from "next/script";
 
 import Footer from "components/Footer";
 import Header from "components/Header";
@@ -23,12 +22,6 @@ export default function App({ Component, pageProps }: AppProps) {
                     </div>
                 </NotificationProvider>
             </AuthProvider>
-            <Script
-                id="mobile-vh-fix"
-                dangerouslySetInnerHTML={{
-                    __html: `document.documentElement.style.setProperty("--vh", window.innerHeight * 0.01 + "px");`,
-                }}
-            />
         </>
     );
 }
