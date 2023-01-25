@@ -1,9 +1,9 @@
 import { onSnapshot } from "firebase/firestore";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { referenceTask, removeTask, updateTask } from "api/task";
 import CloseIcon from "components/svg/CloseIcon";
 import { useNotification } from "context/NotificationContext";
+import { referenceTask, removeTask, updateTask } from "lib/task";
 import { default as UserType } from "types/user";
 
 type Props = {

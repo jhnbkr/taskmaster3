@@ -1,16 +1,16 @@
 import { onSnapshot } from "firebase/firestore";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { createTask, queryTasks } from "api/task";
-import {
-    referenceTaskList,
-    removeTaskList,
-    updateTaskList,
-} from "api/tasklist";
 import AddIcon from "components/svg/AddIcon";
 import DeleteIcon from "components/svg/DeleteIcon";
 import Task from "components/Task";
 import { useNotification } from "context/NotificationContext";
+import { createTask, queryTasks } from "lib/task";
+import {
+    referenceTaskList,
+    removeTaskList,
+    updateTaskList,
+} from "lib/tasklist";
 import { default as UserType } from "types/user";
 
 type Props = {

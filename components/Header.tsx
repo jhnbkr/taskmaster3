@@ -1,4 +1,4 @@
-import { logout } from "api/auth";
+import { logout } from "lib/auth";
 import LogoIcon from "components/svg/LogoIcon";
 import LogoName from "components/svg/LogoName";
 import { useAuth } from "context/AuthContext";

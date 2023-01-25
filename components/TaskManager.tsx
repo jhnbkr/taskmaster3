@@ -1,11 +1,11 @@
 import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import { createTaskList, queryTaskLists } from "api/tasklist";
 import AddIcon from "components/svg/AddIcon";
 import TaskList from "components/TaskList";
 import { useAuth } from "context/AuthContext";
 import { useNotification } from "context/NotificationContext";
+import { createTaskList, queryTaskLists } from "lib/tasklist";
 
 export default function TaskManager() {
     const { user } = useAuth();

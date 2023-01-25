@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 
-import { register } from "api/auth";
+import { register } from "lib/auth";
 import { useAuth } from "context/AuthContext";
 import { useNotification } from "context/NotificationContext";
 
