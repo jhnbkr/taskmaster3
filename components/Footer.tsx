@@ -16,16 +16,15 @@ const links: FooterLink[] = [
         href: "https://johnbaker.ca",
         icon: <WebsiteIcon className="h-6 w-6" aria-hidden="true" />,
     },
-
-    {
-        name: "Twitter",
-        href: "https://twitter.com/jhnbkr88",
-        icon: <TwitterIcon className="h-6 w-6" aria-hidden="true" />,
-    },
     {
         name: "GitHub",
         href: "https://github.com/jhnbkr",
         icon: <GitHubIcon className="h-6 w-6" aria-hidden="true" />,
+    },
+    {
+        name: "Twitter",
+        href: "https://twitter.com/jhnbkr88",
+        icon: <TwitterIcon className="h-6 w-6" aria-hidden="true" />,
     },
 ];
 

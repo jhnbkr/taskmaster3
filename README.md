@@ -70,7 +70,7 @@ Open http://localhost:3000 with your browser to see the result.
 -   [ ] UX
     -   [ ] orderable lists
     -   [ ] orderable tasks
-    -   [ ] task transfer between lists
+    -   [ ] transfer tasks between lists
 
 ---
 
