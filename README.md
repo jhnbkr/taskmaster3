@@ -21,7 +21,7 @@
 
 ## Setup
 
-Install dependencies
+Install dependencies.
 
 ```bash
 npm install
@@ -35,7 +35,7 @@ Configure environment, see [Configuration](#configuration).
 touch .env.local
 ```
 
-Run development process
+Run development process.
 
 ```bash
 npm run dev
@@ -71,6 +71,7 @@ Open http://localhost:3000 with your browser to see the result.
     -   [ ] orderable lists
     -   [ ] orderable tasks
     -   [ ] transfer tasks between lists
+    -   [ ] archive lists
 
 ---
 
