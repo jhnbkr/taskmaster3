@@ -10,7 +10,6 @@
 
 ## Stack
 
--   [WCAG](https://www.w3.org/WAI/standards-guidelines/wcag)
 -   [Next.js](https://nextjs.org/docs)
 -   [TypeScript](https://www.typescriptlang.org/docs)
 -   [Tailwind CSS](https://tailwindcss.com/docs)
@@ -72,6 +71,12 @@ Open http://localhost:3000 with your browser to see the result.
     -   [ ] orderable tasks
     -   [ ] transfer tasks between lists
     -   [ ] archive lists
+
+---
+
+## Accessibility
+
+This application follows the [Web Content Accessibility Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag).
 
 ---
 
