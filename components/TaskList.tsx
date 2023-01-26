@@ -1,16 +1,18 @@
 import { onSnapshot } from "firebase/firestore";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import AddIcon from "components/svg/AddIcon";
 import DeleteIcon from "components/svg/DeleteIcon";
 import Task from "components/Task";
 import { useNotification } from "context/NotificationContext";
-import { createTask, queryTasks } from "lib/task";
+import { createTask, queryTasks, updateTask } from "lib/task";
 import {
     referenceTaskList,
     removeTaskList,
     updateTaskList,
 } from "lib/tasklist";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { default as UserType } from "types/user";
 
 type Props = {
@@ -47,7 +49,7 @@ export default function TaskList({ user, taskListId }: Props) {
                 const taskIds: [number, string][] = [];
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    taskIds.push([data.createdAt, doc.id]);
+                    taskIds.push([data.index, doc.id]);
                 });
                 taskIds.sort((a, b) => {
                     return a[0] - b[0];
@@ -81,9 +83,22 @@ export default function TaskList({ user, taskListId }: Props) {
     }
 
     async function handleCreateTask() {
-        const success = user && (await createTask(user, taskListId));
+        const success =
+            user && (await createTask(user, taskListId, taskIds.length));
         if (!success) error("Something went wrong");
     }
+
+    const moveTask = useCallback(
+        (currentIndex: number, targetIndex: number) => {
+            updateTask(user, taskListId, taskIds[currentIndex], {
+                index: targetIndex,
+            });
+            updateTask(user, taskListId, taskIds[targetIndex], {
+                index: currentIndex,
+            });
+        },
+        [user, taskIds, taskListId]
+    );
 
     return (
         <div className="bg-white shadow sm:rounded-lg overflow-hidden">
@@ -108,16 +123,20 @@ export default function TaskList({ user, taskListId }: Props) {
                 </div>
             </fieldset>
             <div className="px-4 divide-y divide-gray-200">
-                {taskIds.map((taskId: string) => {
-                    return (
-                        <Task
-                            key={taskId}
-                            user={user}
-                            taskListId={taskListId}
-                            taskId={taskId}
-                        />
-                    );
-                })}
+                <DndProvider backend={HTML5Backend}>
+                    {taskIds.map((taskId: string, index: number) => {
+                        return (
+                            <Task
+                                key={taskId}
+                                user={user}
+                                taskListId={taskListId}
+                                taskId={taskId}
+                                index={index}
+                                moveTask={moveTask}
+                            />
+                        );
+                    })}
+                </DndProvider>
                 <div
                     onClick={handleCreateTask}
                     className="flex justify-center items-center px-2 py-4"

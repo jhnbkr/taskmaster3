@@ -38,10 +38,12 @@ export function referenceTask(
 
 export async function createTask(
     user: UserType,
-    taskListId: string
+    taskListId: string,
+    index: number
 ): Promise<boolean> {
     try {
         await setDoc(referenceTask(user, taskListId, uuidv4()), {
+            index: index,
             completed: false,
             createdAt: Date.now(),
         });
