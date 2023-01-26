@@ -23,7 +23,7 @@ export default function TaskManager() {
             const taskListIds: [number, string][] = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                taskListIds.push([data.createdAt, doc.id]);
+                taskListIds.push([data.index, doc.id]);
             });
             taskListIds.sort((a, b) => {
                 return a[0] - b[0];
@@ -39,7 +39,8 @@ export default function TaskManager() {
     }, [user]);
 
     async function handleCreateTaskList() {
-        const success = user && (await createTaskList(user));
+        const success =
+            user && (await createTaskList(user, taskListIds.length));
         if (!success) error("Something went wrong");
     }
 

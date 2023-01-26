@@ -1,5 +1,6 @@
 type Task = {
     id: string;
+    index: number;
     description: string;
     completed: boolean;
     createdAt: number;

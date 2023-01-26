@@ -3,8 +3,8 @@ import {
     deleteDoc,
     doc,
     DocumentReference,
-    Query,
     query,
+    Query,
     setDoc,
     updateDoc,
 } from "firebase/firestore";
@@ -25,9 +25,13 @@ export function referenceTaskList(
     return doc(database, "users", user.id, "lists", taskListId);
 }
 
-export async function createTaskList(user: UserType): Promise<boolean> {
+export async function createTaskList(
+    user: UserType,
+    index: number
+): Promise<boolean> {
     try {
         await setDoc(referenceTaskList(user, uuidv4()), {
+            index: index,
             createdAt: Date.now(),
         });
         return true;

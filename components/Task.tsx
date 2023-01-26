@@ -1,20 +1,38 @@
+import type { Identifier, XYCoord } from "dnd-core";
 import { onSnapshot } from "firebase/firestore";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
 
 import CloseIcon from "components/svg/CloseIcon";
 import { useNotification } from "context/NotificationContext";
 import { referenceTask, removeTask, updateTask } from "lib/task";
 import { default as UserType } from "types/user";
+import Bars2Icon from "./svg/Bars2Icon";
 
 type Props = {
     user: UserType;
     taskListId: string;
     taskId: string;
+    index: number;
+    moveTask: (currentIndex: number, targetIndex: number) => void;
 };
 
-export default function Task({ user, taskListId, taskId }: Props) {
+interface DragItem {
+    index: number;
+    id: string;
+    type: string;
+}
+
+export default function Task({
+    user,
+    taskListId,
+    taskId,
+    index,
+    moveTask,
+}: Props) {
     const { error } = useNotification();
 
+    const ref = useRef<HTMLFieldSetElement>(null);
     const [description, setDescription] = useState<string>("");
     const [completed, setCompleted] = useState<boolean>(false);
 
@@ -60,8 +78,69 @@ export default function Task({ user, taskListId, taskId }: Props) {
         if (!success) error("Something went wrong");
     }
 
+    const [{ handlerId }, drop] = useDrop<
+        DragItem,
+        void,
+        { handlerId: Identifier | null }
+    >({
+        accept: "task",
+        collect(monitor) {
+            return {
+                handlerId: monitor.getHandlerId(),
+            };
+        },
+
+        hover(item: DragItem, monitor) {
+            if (!ref.current) {
+                return;
+            }
+            const currentIndex = item.index;
+            const targetIndex = index;
+
+            if (currentIndex === targetIndex) return;
+
+            const hoverBoundingRect = ref.current?.getBoundingClientRect();
+            const hoverMiddleY =
+                (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+            const clientOffset = monitor.getClientOffset();
+            const hoverClientY =
+                (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+            if (
+                (currentIndex < targetIndex && hoverClientY < hoverMiddleY) ||
+                (currentIndex > targetIndex && hoverClientY > hoverMiddleY)
+            )
+                return;
+
+            moveTask(currentIndex, targetIndex);
+            item.index = targetIndex;
+        },
+    });
+
+    const [{ isDragging }, drag] = useDrag({
+        type: "task",
+        item: () => {
+            return { taskId, index };
+        },
+        collect: (monitor: any) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
+
+    drag(drop(ref));
+
     return (
-        <fieldset name="task" className="flex items-center px-2 py-4 space-x-4">
+        <fieldset
+            name="task"
+            className="flex items-center px-2 py-4 space-x-4"
+            ref={ref}
+            style={{ opacity: isDragging ? 0 : 1 }}
+            data-handler-id={handlerId}
+        >
+            <div className="text-slate-400 hover:cursor-pointer">
+                <span className="sr-only">Move task</span>
+                <Bars2Icon className="w-6 h-6" aria-hidden="true" />
+            </div>
             <input
                 name="completed"
                 type="checkbox"
