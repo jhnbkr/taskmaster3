@@ -46,19 +46,11 @@ export default function TaskList({ user, taskListId }: Props) {
         const unsubscribe = onSnapshot(
             queryTasks(user, taskListId),
             (snapshot) => {
-                const taskIds: [number, string][] = [];
+                const taskIds: string[] = [];
                 snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    taskIds.push([data.index, doc.id]);
+                    taskIds.push(doc.id);
                 });
-                taskIds.sort((a, b) => {
-                    return a[0] - b[0];
-                });
-                setTaskIds(
-                    taskIds.map(([_, taskId]) => {
-                        return taskId;
-                    })
-                );
+                setTaskIds(taskIds);
             }
         );
 
@@ -83,6 +75,7 @@ export default function TaskList({ user, taskListId }: Props) {
     }
 
     async function handleCreateTask() {
+        // TODO(john) query last tasks index instead of assuming array length
         const success =
             user && (await createTask(user, taskListId, taskIds.length));
         if (!success) error("Something went wrong");

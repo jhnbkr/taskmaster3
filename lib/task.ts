@@ -3,6 +3,7 @@ import {
     deleteDoc,
     doc,
     DocumentReference,
+    orderBy,
     query,
     Query,
     setDoc,
@@ -16,7 +17,8 @@ import { default as UserType } from "types/user";
 
 export function queryTasks(user: UserType, taskListId: string): Query {
     return query(
-        collection(database, "users/" + user.id, "lists", taskListId, "tasks")
+        collection(database, "users/" + user.id, "lists", taskListId, "tasks"),
+        orderBy("index")
     );
 }
 
@@ -72,6 +74,7 @@ export async function updateTask(
     }
 }
 
+// TODO(john) correct task indecies after removal
 export async function removeTask(
     user: UserType,
     taskListId: string,
