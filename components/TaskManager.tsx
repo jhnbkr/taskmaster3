@@ -20,19 +20,24 @@ export default function TaskManager() {
         }
 
         const unsubscribe = onSnapshot(queryTaskLists(user), (snapshot) => {
-            const taskListIds: [number, string][] = [];
+            // const taskListIds: [number, string][] = [];
+            // snapshot.forEach((doc) => {
+            //     const data = doc.data();
+            //     taskListIds.push([data.index, doc.id]);
+            // });
+            // taskListIds.sort((a, b) => {
+            //     return a[0] - b[0];
+            // });
+            // setTaskListIds(
+            //     taskListIds.map(([_, taskId]) => {
+            //         return taskId;
+            //     })
+            // );
+            const taskListIds: string[] = [];
             snapshot.forEach((doc) => {
-                const data = doc.data();
-                taskListIds.push([data.index, doc.id]);
+                taskListIds.push(doc.id);
             });
-            taskListIds.sort((a, b) => {
-                return a[0] - b[0];
-            });
-            setTaskListIds(
-                taskListIds.map(([_, taskId]) => {
-                    return taskId;
-                })
-            );
+            setTaskListIds(taskListIds);
         });
 
         return () => unsubscribe();

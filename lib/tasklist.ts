@@ -3,6 +3,7 @@ import {
     deleteDoc,
     doc,
     DocumentReference,
+    orderBy,
     query,
     Query,
     setDoc,
@@ -15,7 +16,10 @@ import { default as TaskListType } from "types/tasklist";
 import { default as UserType } from "types/user";
 
 export function queryTaskLists(user: UserType): Query {
-    return query(collection(database, "users/" + user.id, "lists"));
+    return query(
+        collection(database, "users/" + user.id, "lists"),
+        orderBy("index")
+    );
 }
 
 export function referenceTaskList(
