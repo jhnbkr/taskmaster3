@@ -66,7 +66,7 @@ Open http://localhost:3000 with your browser to see the result.
 -   [ ] Dark theme
     -   [ ] default system preference
     -   [ ] persistent user preference
--   [-] UX
+-   [ ] UX
     -   [ ] orderable lists
     -   [x] orderable tasks
     -   [ ] transfer tasks between lists
